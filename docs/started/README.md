@@ -2,7 +2,7 @@
 ![](https://img.shields.io/github/v/release/tpg/attache?style=flat-square)
 
 ::: warning
-Attaché requires that **PHP 7.4** is the default on your local computer. There is no version requirement on the server except what is required by your application.
+Attaché requires **PHP 7.4**. Although there is no version requirement on the server except what is required by your application.
 :::
 
 ## Global installation
@@ -13,18 +13,18 @@ You should install Attaché globally using composer:
 composer global require thepublicgood/attache
 ```
 
-Next, make sure that `~/.composer/vendor/bin` is in your path. Now you should have access to Attache from anywhere on your composer through the `attache` command.
+Make sure that `~/.composer/vendor/bin` is in your path. Now you should have access to Attache from anywhere on your composer through the `attache` command.
 
 ## Git repository required
 
-Attache assumes that your project has already been imported into a Git repository. If not, then you'll need to do that first. Attaché will clone the repository during deployment.
+Attaché assumes that your project has already been imported into a Git repository. If not, then you'll need to do that first. Attaché will clone the repository during deployment.
 
-Attaché will also run a `yarn prod` before beginning the actual deployment to create compiled assets. You'll want to make sure you're not commiting those compiled assets to your repository. For most Laravel applications your `.gitignore` file should include:
+Attaché will also run a `yarn prod` before doing the actual deployment to create compiled assets. You'll want to make sure you're not commiting those compiled assets to your repository. For most Laravel applications your `.gitignore` file should include:
 
 ```
 public/js/
 public/css/
-public/mix-manifest
+public/mix-manifest.json
 ```
 
 Or place a `.gitignore file in `public/js` and `public/css` with the following content:
@@ -34,19 +34,19 @@ Or place a `.gitignore file in `public/js` and `public/css` with the following c
 *
 ```
 
-This will ensure that the `js` and `css` directories are included when committing to your repository.
+This will ensure that the `js` and `css` directories are at least created when cloing the repository.
 
 ## Initialize a project
 
-Initialize your Laravel project by running the following in your project root:
+Initialize Attaché in your Laravel project by running the following in your project root:
 
 ```
 attache init
 ```
 
-The `init` command is usually non-interactive and will simply create a basic config file named `.attache.json` in your project root. The command will attempt to discover the remote Git URL and add it to your config file. If you have more than one Git remote, the `init` command will give you the option to choose before creating the config file.
+The `init` command is usually non-interactive and will create a basic config file named `.attache.json` in your project root. The command will attempt to discover the remote Git URL and add it to your config file automatically. If you have more than one Git remote, the `init` command will give you the option to choose before creating the config file.
 
-The initial config file should look something like this:
+The initial config file looks something like this:
 
 ```json
 {
@@ -84,7 +84,7 @@ If, for some reason you want to use a different filename, you can use the `--fil
 attache init --filename=attache-config.json
 ```
 
-The other Attaché commands will not now how to find the renamed configuration file, you will need to supply a `--config` option with each one.
+The other Attaché commands will not know how to find the renamed configuration file, you will need to supply a `--config` option with each one.
 
 ```
 attache deploy production --config=attache-config.json
@@ -96,11 +96,11 @@ It's strongly recommended that you also add `.attache.json` to your .gitignore f
 
 ## Configuration
 
-Open the `.attache.json` file in your editor. You'll need update the single server configuration to reflect your environment. You can configure as many servers as you need. Each server must have a `name`, a `host`, `port`, `user`, `root` and `brach` setting.
+Open the `.attache.json` file in your editor. You'll need update the server configuration to reflect your environment. You can configure as many servers as you need. Each server must have a `name`, a `host`, `port`, `user`, `root` and `brach` setting and must have a unique name.
 
 | Setting | Description |
 |---------|-------------|
-| `name`  | The key that you can use to reference this server. |
+| `name`  | The unique key that you can use to reference this server. |
 | `host`  | The hostname or IP address of the server. |
 | `port`  | The SSH port. Usually 22. |
 | `user`  | The user that Attaché can log in as to deploy your application. |
@@ -135,7 +135,7 @@ Once deployed, your application structure will look a bit like this:
 +- live -> /project/root/releases/release_id
 ```
 
-## Updating your web server
+## Update your web server
 
 In order for this to work, you'll need to update your web server to serve the `live` symbolic link. If you're using Nginx, you don't need to change anything. Just set `root` to point to the symlink. If you're using Apatache, you might need to use something like `+options FollowSymLinks` to get Apatche to actually serve the symbolic link.
 
@@ -147,11 +147,11 @@ This step is optional, but it makes set up a little easier. Create a copy of you
 cp .env attache.env
 ```
 
-Change the content of the new `attache.env` file to match how it would look on the server.
+Change the content of the new `attache.env` file to match how it would look on the server. If you don't do this, Attaché will use the content of the `.env.example` file but will automatically set `APP_ENV=production` and `EPP_DEBUG=false`.
 
 ## First deployment
 
-Before running your first deployment, we'll assume that you have already created a database schema for your application and you've updated the `attache.env` file. If you want, you can also add the `migrate` option to your server config and set it to `true`. This will even migrate your database for you:
+Before running your first deployment, we'll assume that you have already created a database schema for your application and you've updated the `attache.env` file. If you want, you can also add the `migrate` option to your server config and set it to `true`. This will migrate your database for you.
 
 ```json
 {
@@ -162,7 +162,7 @@ Before running your first deployment, we'll assume that you have already created
 }
 ```
 
-Once you all the set up tasks complete, you can deploy your application for the first time. Usually when deploying, you'll use the `attache deploy` command, but since this is the first one, you should use the `attache install` command. This takes a few extra steps (like placing the `.env` file and the `storage` directory) that would not normally be done during a normal deployment. Pass the name of the server you configured as an attribute to the `install` command:
+Once you have the set up tasks complete, you can deploy your application for the first time. Usually when deploying, you'll use the `attache deploy` command, but since this is the first one, you'll need to use the `attache install` command. This takes a few extra steps (like placing the `.env` file and the `storage` directory) that would not normally be done during a normal deployment. Pass the name of the server you configured as an attribute to the `install` command:
 
 ```
 attache install production --env=attache.env
