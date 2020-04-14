@@ -89,6 +89,31 @@ attache deploy #staging
 attache deploy production #production
 ```
 
+If you only have a single server configuration, then that server will be the default. You don't need to specify the `default` in your config file, and you don't need to specify the server name on the command-line.
+
+```json
+{
+    "repository": "git@repository.git",
+    "default": "staging",   
+    "servers": [
+        {
+            "name": "production",
+            //...
+        }
+    ]
+}
+```
+
+To deploy to the single server, simply run `attache deploy`:
+
+```bash
+# These two are identical:
+
+attache deploy
+
+attache deploy production 
+```
+
 ## Custom paths
 Attaché is quite opinionated about how the directory structure on the server should appear. However, there is some flexibility in how the directories and files are named. And you can configure this on a per-server basis by added a `paths` object to a server configuration. The `attache init` command already does this when creating a new configuration file. The `paths` object is not required and a the defaults will be used.
 
