@@ -1,4 +1,5 @@
 # Getting Started
+
 ![](https://img.shields.io/github/v/release/tpg/attache?style=flat-square)
 
 ::: warning
@@ -27,7 +28,7 @@ public/css/
 public/mix-manifest.json
 ```
 
-Or place a `.gitignore file in `public/js` and `public/css` with the following content:
+Or place a `.gitignore file in`public/js`and`public/css` with the following content:
 
 ```
 !.gitignore
@@ -92,20 +93,22 @@ attache deploy production --config=attache-config.json
 
 ## Safety first
 
-It's strongly recommended that you also add `.attache.json` to your .gitignore file. This will ensure you don't potentially commit sensitive details about your environment into your repository. Instead, you should keep a copy of your config locally. If you ever loose the config file, it's simple enough to recreate.
+It's recommended that you add `.attache.json` to your .gitignore file unless there is very good reason to not do so. This will ensure you don't potentially commit sensitive details about your environment into a publicly accessible repository. Instead, you could keep a copy of your config locally. If you ever loose the config file, it's simple enough to recreate.
+
+If committing the config file to your repository, ensure that it is private and that your server is properly secured.
 
 ## Configuration
 
 Open the `.attache.json` file in your editor. You'll need update the server configuration to reflect your environment. You can configure as many servers as you need. Each server must have a `name`, a `host`, `port`, `user`, `root` and `brach` setting and must have a unique name.
 
-| Setting | Description |
-|---------|-------------|
-| `name`  | The unique key that you can use to reference this server. |
-| `host`  | The hostname or IP address of the server. |
-| `port`  | The SSH port. Usually 22. |
-| `user`  | The user that Attaché can log in as to deploy your application. |
-| `root`  | The path to the deployment root (see directory structure below). |
-| `branch` | The Git branch to clone from. |
+| Setting  | Description                                                      |
+| -------- | ---------------------------------------------------------------- |
+| `name`   | The unique key that you can use to reference this server.        |
+| `host`   | The hostname or IP address of the server.                        |
+| `port`   | The SSH port. Usually 22.                                        |
+| `user`   | The user that Attaché can log in as to deploy your application.  |
+| `root`   | The path to the deployment root (see directory structure below). |
+| `branch` | The Git branch to clone from.                                    |
 
 Attaché does not support password authentication and you MUST be able to log in to the server as the specified user using a public-private key.
 
