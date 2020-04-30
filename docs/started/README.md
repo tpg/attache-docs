@@ -72,6 +72,11 @@ The initial config file looks something like this:
                 "bin": "composer",
                 "local": false
             },
+            "assets": {
+                "public/js": "public/js",
+                "public/css": "public/css",
+                "public/mix-manifest.json": "public/mix-manifest.json"
+            },
             "branch": "master",
             "migrate": false
         }

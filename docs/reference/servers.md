@@ -1,7 +1,9 @@
 # Server Configuration
+
 ![](https://img.shields.io/github/v/release/tpg/attache?style=flat-square)
 
 ## Multiple servers
+
 You can set up as many servers are you like in the Attaché configuration file. The `servers` configuration is just a JSON array of objects, each object representing another server. The only requirement is that each server must have a unique `name` attribute.
 
 This can be handy if you want to have your testing, staging and production environments all set up in the same configuration. Or if your application is actually a number of different microservices that get deployed to the same server.
@@ -10,11 +12,11 @@ This can be handy if you want to have your testing, staging and production envir
 {
     "servers": [
         {
-            "name": "production",
+            "name": "production"
             //...
         },
         {
-            "name": "staging",
+            "name": "staging"
             //...
         },
         {
@@ -32,6 +34,7 @@ attache deploy staging
 ```
 
 ## Common server configuration
+
 If your configuration includes multiple servers that all reference the same physical host, instead of configuration each server with exactly the same details each time, you can set a `common` server configuration object. Any attributes you add to the `common` object will be set as the default across all your server configurations. You can override the common config by adding the custom attributes to the servers that need them.
 
 ```json{2-7}
@@ -46,7 +49,8 @@ If your configuration includes multiple servers that all reference the same phys
         {
             "name": "staging",
             "branch": "master"
-        }, {
+        },
+        {
             "name": "testing",
             "branch": "testing"
         }
@@ -63,18 +67,20 @@ attache deploy testing
 ```
 
 ## Default server
+
 When you have multiple servers set up, it can be useful to have one of them as the server you deploy to most often. For example, you'll likely deploy to a testing environment more often than to your production environment. Attaché provides a useful feature to set one of your servers as the default by setting the `default` attribute to the name of a server.
 
 ```json{3}
 {
     "repository": "git@repository.git",
-    "default": "staging",   
+    "default": "staging",
     "servers": [
         {
-            "name": "staging",
+            "name": "staging"
             //...
-        },{
-            "name": "production",
+        },
+        {
+            "name": "production"
             //...
         }
     ]
@@ -94,10 +100,10 @@ If you only have a single server configuration, then that server will be the def
 ```json
 {
     "repository": "git@repository.git",
-    "default": "staging",   
+    "default": "staging",
     "servers": [
         {
-            "name": "production",
+            "name": "production"
             //...
         }
     ]
@@ -111,10 +117,11 @@ To deploy to the single server, simply run `attache deploy`:
 
 attache deploy
 
-attache deploy production 
+attache deploy production
 ```
 
 ## Custom paths
+
 Attaché is quite opinionated about how the directory structure on the server should appear. However, there is some flexibility in how the directories and files are named. And you can configure this on a per-server basis by added a `paths` object to a server configuration. The `attache init` command already does this when creating a new configuration file. The `paths` object is not required and a the defaults will be used.
 
 ```json{6-11}
@@ -134,12 +141,12 @@ Attaché is quite opinionated about how the directory structure on the server sh
 }
 ```
 
-| Path | Description |
-|------|-------------|
-| `releases` | Where your deployments are stored. |
-| `serve` | The symbolic link that is created to point to the latest release. |
-| `storage` | The storage directory. This will be symlinked as `storage` into the latest release. |
-| `env` | The name of the `.env` file. This will be symlinked as `.env` into the latest release. |
+| Path       | Description                                                                            |
+| ---------- | -------------------------------------------------------------------------------------- |
+| `releases` | Where your deployments are stored.                                                     |
+| `serve`    | The symbolic link that is created to point to the latest release.                      |
+| `storage`  | The storage directory. This will be symlinked as `storage` into the latest release.    |
+| `env`      | The name of the `.env` file. This will be symlinked as `.env` into the latest release. |
 
 You don't need to provide all of the path overrides. Only the ones you wish to change. So it would be perfectly acceptable if you wanted to change just the `serve` symlink.
 
@@ -159,7 +166,25 @@ You don't need to provide all of the path overrides. Only the ones you wish to c
 
 The above configuration will create a symbolic link named "www" which will point to the latest release inside the `releases` directory.
 
+## Asset configuration
+
+During deployment Attaché will copy any compiled assets to the server using `scp`. By default Attaché will always copy the entire contents of the `public/js`, `public/css` directories and the `public/mix-manifest.json` file. However, sometimes you may need to copy additional assets that aren't normally a part of your repository. For example, you may have an additional resource that needs to be in the public directory that is created during the build stage. You can asset the asset here by specifying the local asset filename as the key and the remote asset as the value:
+
+```json
+{
+    "servers": [
+        {
+            "assets": {
+                "public/vendors~js": "public/vendors~js",
+                "public/local-asset": "public/remote-asset"
+            }
+        }
+    ]
+}
+```
+
 ## PHP configuration
+
 Attaché assumes that to run PHP on the server, all we need to do is use `php`. However, in some cases you may find that this isn't the case. For example, if you don't have control over how PHP is installed, and there are multiple versions available, to use PHP 7.4, you might need to use the command `php74` or perhaps `php-7.4`. Maybe you need to specify the full path to the PHP binary.
 
 Attaché provides a simple configuration to allow for this. You can add a `php` configuration object and provide the path to the PHP binary, or just the name if it's in the path, to the `bin` attribute.
@@ -181,6 +206,7 @@ Attaché provides a simple configuration to allow for this. You can add a `php` 
 ```
 
 ## Composer configuration
+
 Connected to the custom PHP binary configuration, you can do the same with Composer. Attaché assumes that Composer is already installed and on the path and can be run from the command-line with a simple `composer`. However, in some cases, you might not have that much control over where Composer installed, how it's named of if you can install it on the path at all.
 
 If the name of the composer binary is something other than `composer`, you can use the same structure as the `php` object, except named `composer`.
@@ -215,13 +241,14 @@ It's also very possible that you'll need to download composer manually in order 
 This will ensure that a `composer.phar` binary is downloaded and placed at the project root. Attaché will also run a `selfupdate` each time you run the `deploy` command and `local` is set to `true.
 
 ## Migrating a database
+
 Attaché provides a simple solution to help keep your database up-to-date. If you add a `migrate` attribute to your server configuration and set it to `true`, Attaché will also run `php artisan migrate` for you inside your project. However, take note that you should be careful when doing this. Migrating a database can be destructive and since Attaché will also force the migration you could potentially do damange to your database if you're not careful. For this reason, the `migrate` attribute defaults to `false` meaning you conciously need to change it to `true`.
 
 ```json{4}
 {
     "name": "server",
     //...
-    "migrate": true,
+    "migrate": true
     //...
 }
 ```
