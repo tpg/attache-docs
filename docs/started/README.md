@@ -98,7 +98,7 @@ attache deploy production --config=attache-config.json
 
 ## Safety first
 
-It's recommended that you add `.attache.json` to your .gitignore file unless there is very good reason to not do so. This will ensure you don't potentially commit sensitive details about your environment into a publicly accessible repository. Instead, you could keep a copy of your config locally. If you ever loose the config file, it's simple enough to recreate.
+It's recommended that you add `.attache.json` to your .gitignore file unless there is very good reason to have it in your repository. This will ensure you don't potentially commit sensitive details about your environment into a publicly accessible repository. Instead, you could keep a copy of your config locally. If you ever loose the config file, it's simple enough to recreate.
 
 If committing the config file to your repository, ensure that it is private and that your server is properly secured.
 
@@ -145,7 +145,7 @@ Once deployed, your application structure will look a bit like this:
 
 ## Update your web server
 
-In order for this to work, you'll need to update your web server to serve the `live` symbolic link. If you're using Nginx, you don't need to change anything. Just set `root` to point to the symlink. If you're using Apatache, you might need to use something like `+options FollowSymLinks` to get Apatche to actually serve the symbolic link.
+In order for this to work, you'll need to update your web server to serve the `live` symbolic link. If you're using Nginx, you don't need to change anything. Just set `root` to point to the symlink. If you're using Apache, you might need add something like `+options FollowSymLinks` to your server config to get it to actually serve the symlink.
 
 ## Server `.env` file
 
@@ -155,7 +155,7 @@ This step is optional, but it makes set up a little easier. Create a copy of you
 cp .env attache.env
 ```
 
-Change the content of the new `attache.env` file to match how it would look on the server. If you don't do this, Attaché will use the content of the `.env.example` file but will automatically set `APP_ENV=production` and `EPP_DEBUG=false`.
+Change the content of the new `attache.env` file to match how it would look on the server. If you don't do this, Attaché will use the content of the `.env.example` file but will automatically set `APP_ENV=production` and `APP_DEBUG=false`.
 
 ## First deployment
 
@@ -170,13 +170,13 @@ Before running your first deployment, we'll assume that you have already created
 }
 ```
 
-Once you have the set up tasks complete, you can deploy your application for the first time. Usually when deploying, you'll use the `attache deploy` command, but since this is the first one, you'll need to use the `attache install` command. This takes a few extra steps (like placing the `.env` file and the `storage` directory) that would not normally be done during a normal deployment. Pass the name of the server you configured as an attribute to the `install` command:
+Once you have the set up tasks complete, you can deploy your application for the first time. Usually when deploying, you'll use the `attache deploy` command, but since this is the first one, you'll need to use the `attache install` command. This takes a few extra steps (like placing the `.env` file and the `storage` directory) that would not normally be done during a normal deployment. If you created an `attache.env` file, specify it with the `--env` command-line attribute.
 
 ```
-attache install production --env=attache.env
+attache install --env=attache.env
 ```
 
-Deployment usually takes a few seconds to a few miinutes depending on the complexity if your application and build tasks.
+Deployment usually takes a few seconds to a few minutes depending on the complexity if your application and build tasks.
 
 ## Conclusion
 

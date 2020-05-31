@@ -6,7 +6,7 @@
 
 You can set up as many servers are you like in the Attaché configuration file. The `servers` configuration is just a JSON array of objects, each object representing another server. The only requirement is that each server must have a unique `name` attribute.
 
-This can be handy if you want to have your testing, staging and production environments all set up in the same configuration. Or if your application is actually a number of different microservices that get deployed to the same server.
+This can be handy if you want to have your testing, staging and production environments all set up in the same configuration. Or if your application is actually a number of different microservices that get deployed at the same time.
 
 ```json
 {
@@ -33,9 +33,11 @@ When deploying, you can simply specify the server you want to deploy to as the o
 attache deploy staging
 ```
 
+If you only have a single server configured, you can omit the server name on the command line.
+
 ## Common server configuration
 
-If your configuration includes multiple servers that all reference the same physical host, instead of configuration each server with exactly the same details each time, you can set a `common` server configuration object. Any attributes you add to the `common` object will be set as the default across all your server configurations. You can override the common config by adding the custom attributes to the servers that need them.
+If your configuration includes multiple servers that all share some common configuration, then instead of configuration each server with exactly the same details each time, you can set a `common` server configuration object. Any attributes you set in the `common` object will be set as the default across all your server configurations. You can override the common config by adding the custom attributes to the servers that need them.
 
 ```json{2-7}
 {
@@ -53,6 +55,11 @@ If your configuration includes multiple servers that all reference the same phys
         {
             "name": "testing",
             "branch": "testing"
+        },
+        {
+            "name": "production",
+            "branch": "master",
+            "host": "myproductionhost.test"
         }
     ]
 }
@@ -64,7 +71,11 @@ The `deploy` script still works in the same way, however, the config from the `c
 attache deploy staging
 # or
 attache deploy testing
+# or
+attache deploy production
 ```
+
+Each of these deploy commands will share the config from the `common` configuration, but override the name, branch and host settings per server.
 
 ## Default server
 
@@ -87,7 +98,7 @@ When you have multiple servers set up, it can be useful to have one of them as t
 }
 ```
 
-Now when running any command that requires a server be specified, Attaché will assume you mean the default one if you leave the server name out. So `attache deploy` will automatically deploy to the staging server. You can still deploy to your other servers by making sure you specify the name on the command-line.
+Now when running any command that requires a server name, Attaché will assume you mean the default one if you don't specify a server name on the command line. So in the example above, `attache deploy` will automatically deploy to the staging server. You can still deploy to your other servers by making sure you specify the name on the command line.
 
 ```bash
 attache deploy #staging
@@ -95,7 +106,7 @@ attache deploy #staging
 attache deploy production #production
 ```
 
-If you only have a single server configuration, then that server will be the default. You don't need to specify the `default` in your config file, and you don't need to specify the server name on the command-line.
+If you only have a single server configuration, then that server will automatically be set as the default. You don't need to specify the `default` in your config file, and you don't need to specify the server name on the command line.
 
 ```json
 {
@@ -113,7 +124,7 @@ If you only have a single server configuration, then that server will be the def
 To deploy to the single server, simply run `attache deploy`:
 
 ```bash
-# These two are identical:
+# With the example above, these two are identical:
 
 attache deploy
 
@@ -122,7 +133,7 @@ attache deploy production
 
 ## Custom paths
 
-Attaché is quite opinionated about how the directory structure on the server should appear. However, there is some flexibility in how the directories and files are named. And you can configure this on a per-server basis by added a `paths` object to a server configuration. The `attache init` command already does this when creating a new configuration file. The `paths` object is not required and a the defaults will be used.
+Attaché is quite opinionated about how the directory structure on the server should appear. However, there is some flexibility in how the directories and files are named. You can configure this on a per-server basis by adding a `paths` object. The `attache init` command already does this when creating a new configuration file. The `paths` object is not required and a the defaults will be used.
 
 ```json{6-11}
 {
@@ -168,9 +179,9 @@ The above configuration will create a symbolic link named "www" which will point
 
 ## Asset configuration
 
-During deployment Attaché will copy any compiled assets to the server using `scp`. By default Attaché will always copy the entire contents of the `public/js`, `public/css` directories and the `public/mix-manifest.json` file. However, sometimes you may need to copy additional assets that aren't normally a part of your repository. For example, you may have an additional resource that needs to be in the public directory that is created during the build stage. You can asset the asset here by specifying the local asset filename as the key and the remote asset as the value:
+During deployment Attaché will copy any compiled assets to the server using `scp`. By default Attaché will always copy the entire contents of the `public/js`, `public/css` directories and the `public/mix-manifest.json` file. However, sometimes you may need to copy additional assets that aren't normally a part of your repository. For example, you may have an additional resource that needs to be in the public directory that is created during the build stage. You can specify these assets by added an `assets` config and specifying the local asset filename as the key and the remote asset as the value:
 
-```json
+```json{4-7}
 {
     "servers": [
         {
@@ -183,11 +194,25 @@ During deployment Attaché will copy any compiled assets to the server using `sc
 }
 ```
 
+Since assets are copied AFTER the symbolic links are created, you can also use this feature to copy assets in your storage directory:
+
+```json{5}
+{
+    "servers": [
+        {
+            "assets": {
+                "storage/app/public/demo": "storage/app/public/demo"
+            }
+        }
+    ]
+}
+```
+
 ## PHP configuration
 
-Attaché assumes that to run PHP on the server, all we need to do is use `php`. However, in some cases you may find that this isn't the case. For example, if you don't have control over how PHP is installed, and there are multiple versions available, to use PHP 7.4, you might need to use the command `php74` or perhaps `php-7.4`. Maybe you need to specify the full path to the PHP binary.
+Attaché assumes that the command to run PHP on the server is simply: `php`. However, in some cases you may find that you need to configure this. For example, if you don't have control over how PHP is installed, and there are multiple versions available, to use PHP 7.4, you might need to use the command `php74` or perhaps `php-7.4`. Maybe you need to specify the full path to the PHP binary.
 
-Attaché provides a simple configuration to allow for this. You can add a `php` configuration object and provide the path to the PHP binary, or just the name if it's in the path, to the `bin` attribute.
+Attaché provides a simple configuration solution for this scenario. You can add a `php` configuration and provide the path to the PHP binary, or just the command that needs to be run to the `bin` attribute.
 
 ```json{6-10}
 {
@@ -207,9 +232,9 @@ Attaché provides a simple configuration to allow for this. You can add a `php` 
 
 ## Composer configuration
 
-Connected to the custom PHP binary configuration, you can do the same with Composer. Attaché assumes that Composer is already installed and on the path and can be run from the command-line with a simple `composer`. However, in some cases, you might not have that much control over where Composer installed, how it's named of if you can install it on the path at all.
+Like like the PHP binary configuration, you can customize the Composer configuration. Attaché assumes that Composer is already installed and on the path and can be run from the command line with a simple `composer`. However, in some cases, you might not have that much control over where Composer installed, how it's named of if you can install it on the path at all.
 
-If the name of the composer binary is something other than `composer`, you can use the same structure as the `php` object, except named `composer`.
+If the name of the composer binary is something other than `composer`, you can use the same structure as the `php` object.
 
 ```json{6-8}
 {
@@ -240,9 +265,22 @@ It's also very possible that you'll need to download composer manually in order 
 
 This will ensure that a `composer.phar` binary is downloaded and placed at the project root. Attaché will also run a `selfupdate` each time you run the `deploy` command and `local` is set to `true.
 
+Lastly, in some cases you may want to install dev dependencies. This is sometimes true if your demoing a project and you're seeding your database with Faker. In that case you may want to install your dev dependencies. You can do this by setting the `dev` option to `true:
+
+```json{6}
+{
+    "name": "server",
+    "composer": {
+        "bin": "composer.phar",
+        "local": true,
+        "dev": true
+    }
+}
+```
+
 ## Migrating a database
 
-Attaché provides a simple solution to help keep your database up-to-date. If you add a `migrate` attribute to your server configuration and set it to `true`, Attaché will also run `php artisan migrate` for you inside your project. However, take note that you should be careful when doing this. Migrating a database can be destructive and since Attaché will also force the migration you could potentially do damange to your database if you're not careful. For this reason, the `migrate` attribute defaults to `false` meaning you conciously need to change it to `true`.
+Attaché provides a simple solution to help keep your database up-to-date. If you add a `migrate` attribute to your server configuration and set it to `true`, Attaché will also run `php artisan migrate` for you inside your project. However, take note that you should be careful when doing this. Migrating a database can be destructive and since Attaché will force the migration you could potentially do damange to your database if you're not careful. For this reason, the `migrate` attribute defaults to `false` meaning you conciously need to change it to `true`.
 
 ```json{4}
 {
