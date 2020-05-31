@@ -3,7 +3,7 @@
 ![](https://img.shields.io/github/v/release/tpg/attache?style=flat-square)
 
 ::: warning
-Attaché requires **PHP 7.4**. Although there is no version requirement on the server except what is required by your application.
+Attaché requires that **PHP v7.4** is installed on your local computer. There is no version requirement on the server except what is required by your application.
 :::
 
 ## Global installation
@@ -145,7 +145,7 @@ Once deployed, your application structure will look a bit like this:
 
 ## Update your web server
 
-In order for this to work, you'll need to update your web server to serve the `live` symbolic link. If you're using Nginx, you don't need to change anything. Just set `root` to point to the symlink. If you're using Apache, you might need add something like `+options FollowSymLinks` to your server config to get it to actually serve the symlink.
+In order for this to work, you'll need to update your web server to serve the `live` symbolic link. If you're using Nginx, you don't need to change anything. Just set `root` to point to the symlink. If you're using Apache, you might need add something like `+options FollowSymLinks` to your server config to get it to actually serve the symbolic link.
 
 ## Server `.env` file
 
