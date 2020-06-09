@@ -5,16 +5,19 @@ tagLine: Highly opinionated deployment tool for Laravel applications.
 actionText: Get Started
 actionLink: /started/
 features:
-  - title: Simple Configuration
-    details: Get up and deploying in just a few steps. No more complicated deployment scripts
-  - title: Designed for Laravel
-    details: Attaché was originally based on Envoy but has moved on. It is very much a Laravel deployment tool.
-  - title: Release management
-    details: Provides a set of simple, yet powerful tools for keep on top of your releases.
+    - title: Simple configuration
+      details: Get up and deploying in just a few steps. No more complicated deployment scripts.
+    - title: No downtime
+      details: Zero-downtime deployments are now super easy. No more long delays for your users.
+    - title: Made for Laravel
+      details: Originally based on Laravel Envoy, Attaché was designed and written as a Laravel deployment tool.
 footer: MIT Licensed | Copyright © 2020-present THEPUBLICGOOD
 ---
 
+![Config](./config.png)
+
 ## Yet another deployment tool?
+
 Attaché was designed around a deployment method I've been following for years now. As someone who uses Laravel a great deal, Laravel Envoy made a lot of sense and I developed a zero downtime approach to deployments that I've used many times with many different projects.
 
 Attaché is an encapsulation of that deployment process. I wrote an article (and then rewrote that article) around it, which you can find here:

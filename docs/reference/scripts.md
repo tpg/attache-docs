@@ -72,6 +72,36 @@ You can add as many commands per script hook as you like. Since they are arrays 
 }
 ```
 
+## The `build` script
+
+Developers often have different approaches to building assets for their projects. For this reason, a `build` script hook was added so that the build task can be altered as you need. By default Attaché will simply run `yarn prod` in your project root and assume that will get your assets built. What if you're not using `yarn`? What if your using something completely different? The `build` script works the same was as any other script hook. Pass an array of commands you need to run:
+
+```json{5}
+{
+    "name": "server",
+    //...
+    "scripts": {
+        "build": ["npm run production"]
+    }
+}
+```
+
+::: warning Note
+Note that if you provide a `build` script, even if it's an empty array, the default `yarn prod` script will not be executed. This is handy if you don't need the build step at all.
+:::
+
+```json{5}
+{
+    "name": "server",
+    //...
+    "scripts": {
+        "build": []
+    }
+}
+```
+
+If you don't need to change the script that is used to build assets, but just need to run an extra command, rather use the `before-build` and `after-build` script hooks and leave the `build` script out.
+
 ## Script tags
 
 All scripts are run from the servers root path. This means that if you need to access files from your scripts that belong to the current release, you'll need to know the release ID. Since you won't actually have that information, Attaché provides a script tag that will insert the correct path to the release into your script. There are a few other tags as well which can be handy.
