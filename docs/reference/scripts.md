@@ -40,6 +40,15 @@ For example, if you're using the `migrate` setting and allowing Attaché to migr
 }
 ```
 
+Some scripts are run locally and some are run on the server. Attaché currently doesn't provide a way to force a script to run locally or remotely. You'll need to select the correct depending on where and when it will be run:
+
+| Hook     | Environment | Path             |
+| -------- | ----------- | ---------------- |
+| `build`  | local       | application root |
+| `deploy` | remote      | project root     |
+| `assets` | local       | application root |
+| `live`   | remote      | project root     |
+
 ## Deploy step hooks
 
 In addition to the hooks around the for major tasks, you can also hook into the steps within the tasks. The following steps also have before and after script hooks:
@@ -52,6 +61,8 @@ In addition to the hooks around the for major tasks, you can also hook into the 
 | `install`       | Run scripts before or after the `.env` file and `storage` directory are created during install. |
 | `symlinks`      | Run scripts before or after the `.env` and `storage` symbolic links are created.                |
 | `migrate`       | Run scripts before or after the database is migrated.                                           |
+
+Bear in mind that all deploy steps are run on the server.
 
 Some scripts are dependent on configuration or current process. The `install` scripts will only run during installation when running the `attache install` command, and the `migrate` scripts will only run if the `migrate` setting has been set to `true` in the configuration.
 
