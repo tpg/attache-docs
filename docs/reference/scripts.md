@@ -63,7 +63,7 @@ In addition to the hooks around the for major tasks, you can also hook into the 
 | `migrate`      | Run scripts before or after the database is migrated.                                           |
 
 ::: tip NOTE
-In previous versions, the `prepcomposer` step was named `prep-composer`. As of v0.6.3, the step is named `prepcomposer`.
+In previous versions, the `prepcomposer` step was named `prep-composer`. As of v0.6.4, the step is named `prepcomposer`.
 :::
 
 Bear in mind that all deploy steps are run on the server.
