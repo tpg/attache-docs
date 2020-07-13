@@ -53,14 +53,18 @@ Some scripts are run locally and some are run on the server. Attaché currently 
 
 In addition to the hooks around the for major tasks, you can also hook into the steps within the tasks. The following steps also have before and after script hooks:
 
-| Step            | Description                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------- |
-| `clone`         | Run scripts before or after the project is cloned from the Git repo.                            |
-| `prep-composer` | Run scripts before or after Composer is downloaded or updated.                                  |
-| `composer`      | Run scripts before or after the `composer install` command is run.                              |
-| `install`       | Run scripts before or after the `.env` file and `storage` directory are created during install. |
-| `symlinks`      | Run scripts before or after the `.env` and `storage` symbolic links are created.                |
-| `migrate`       | Run scripts before or after the database is migrated.                                           |
+| Step           | Description                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| `clone`        | Run scripts before or after the project is cloned from the Git repo.                            |
+| `prepcomposer` | Run scripts before or after Composer is downloaded or updated.                                  |
+| `composer`     | Run scripts before or after the `composer install` command is run.                              |
+| `install`      | Run scripts before or after the `.env` file and `storage` directory are created during install. |
+| `symlinks`     | Run scripts before or after the `.env` and `storage` symbolic links are created.                |
+| `migrate`      | Run scripts before or after the database is migrated.                                           |
+
+::: tip NOTE
+In previous versions, the `prepcomposer` step was named `prep-composer`. As of v0.6.3, the step is named `prepcomposer`.
+:::
 
 Bear in mind that all deploy steps are run on the server.
 
@@ -127,12 +131,14 @@ All tags are prefixed with a single `@`. If needed, you can also surround your t
 
 ### Available tags
 
-| Tag         | Description                     |
-| ----------- | ------------------------------- |
-| `@php`      | The configured PHP binary.      |
-| `@composer` | The configured Composer binary. |
-| `@release`  | The ID of the current release.  |
+| Tag            | Description                                   |
+| -------------- | --------------------------------------------- |
+| `@php`         | The configured PHP binary.                    |
+| `@composer`    | The configured Composer binary.               |
+| `@release`     | The ID of the current release.                |
+| `@root`        | The remote project root path.                 |
+| `@path:<path>` | Returns the full specified path on the server |
 
-::: warning
-Do not attempt to use the `@release` tag in a `before-build`, `after-build`, `before-deploy` or `before-clone` script hook as the ID will be that of the currently ACTIVE release. This is a result of the new release not actually existing on the server yet.
+::: tip NOTE
+In previous versions you could not use the `@release` tag in a `before-build`, `after-build`, `before-deploy` or `before-clone` script hook as the ID returned was that of the currently ACTIVE release. This has changed as of 0.6.3. The `@release` tag will now always return the release ID currently being deployed.
 :::
