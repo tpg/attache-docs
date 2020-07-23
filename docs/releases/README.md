@@ -82,7 +82,7 @@ You can also prune releases automatically during deployment by using the `--prun
 attache deploy production --prune
 ```
 
-:::: note
+:::: tip Note
 Note that you can never prune the current active release. Attaché will not allow a prune to complete if the active release would be removed.
 ::::
 
