@@ -3,7 +3,7 @@
 ![](https://img.shields.io/github/v/release/tpg/attache?style=flat-square)
 
 ::: warning
-Attaché requires that **PHP v7.4** is installed on your local computer. There is no version requirement on the server except what is required by your application.
+Attaché requires **PHP v7.4** locally. There is no version requirement on the server except what is required by your application, however Attaché only supports Laravel 6 or newer and is only tested on the current major release.
 :::
 
 ## Global installation
@@ -52,8 +52,8 @@ The initial config file looks something like this:
 ```json
 {
     "repository": "git@repository.git",
-    "servers": [
-        {
+    "servers": {
+        "production": {
             "name": "production",
             "host": "example.test",
             "port": 22,
@@ -80,7 +80,7 @@ The initial config file looks something like this:
             "branch": "master",
             "migrate": false
         }
-    ]
+    }
 }
 ```
 
@@ -104,18 +104,19 @@ If committing the config file to your repository, ensure that it is private and 
 
 ## Configuration
 
-Open the `.attache.json` file in your editor. You'll need update the server configuration to reflect your environment. You can configure as many servers as you need. Each server must have a `name`, a `host`, `port`, `user`, `root` and `brach` setting and must have a unique name.
+Open the `.attache.json` file in your editor. You'll need update the server configuration to reflect your environment. You can configure as many servers as you need. Each server describes a deployment target and can have `host`, `port`, `user`, `root` and `brach` settings.
 
 | Setting  | Description                                                      |
 | -------- | ---------------------------------------------------------------- |
-| `name`   | The unique key that you can use to reference this server.        |
 | `host`   | The hostname or IP address of the server.                        |
 | `port`   | The SSH port. Usually 22.                                        |
 | `user`   | The user that Attaché can log in as to deploy your application.  |
 | `root`   | The path to the deployment root (see directory structure below). |
 | `branch` | The Git branch to clone from.                                    |
 
+::: tip Note
 Attaché does not support password authentication and you MUST be able to log in to the server as the specified user using a public-private key.
+:::
 
 ## Directory structure on the server
 
@@ -163,7 +164,6 @@ Before running your first deployment, we'll assume that you have already created
 
 ```json
 {
-    "name": "production",
     "host": "example.test",
     //...
     "migrate": true

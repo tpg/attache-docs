@@ -6,16 +6,15 @@ Attaché's deployment process is fairly rigid and doesn't really allow for much 
 
 There are a few script hooks available and they let you insert commands before or after any number of steps during deployment. There are four tasks that are run for each deployment, namely **build**, **deploy**, **assets** and **live**. The big one is the **deploy** task, which contains a number of steps. The others represent smaller, but no-less important task. You can hook into any one of these tasks, either before or after, by passing an array of commands to hooks specified in a `scripts` object per server.
 
-```json{5-9}
+```json{4-6}
 {
-    "servers": [
-        {
-            "name": "production",
+    "servers": {
+        "production": {
             "scripts": {
                 "before-deploy": ["echo \"Deploying\""]
             }
         }
-    ]
+    }
 }
 ```
 
@@ -25,18 +24,17 @@ Each task has a `before` and `after` script hook. So there is a `before-build`, 
 
 For example, if you're using the `migrate` setting and allowing Attaché to migrate changes to your database, you might consider dumping your database just before deployment.
 
-```json{6-8}
+```json{5-7}
 {
-    "servers": [
-        {
-            "name": "production",
+    "servers": {
+        "production": {
             "scripts": {
                 "before-deploy": [
                     "mysqldump --databases my_app storage/backups/backup.sql"
                 ]
             }
         }
-    ]
+    }
 }
 ```
 
@@ -74,9 +72,8 @@ The previous example could then be updated by changing the `before-deploy` hook 
 
 You can add as many commands per script hook as you like. Since they are arrays you can simply comma-separate script lines.
 
-```json{5-8}
+```json{4-7}
 {
-    "name": "server",
     //...
     "scripts": {
         "after-composer": [
@@ -91,9 +88,8 @@ You can add as many commands per script hook as you like. Since they are arrays 
 
 Developers often have different approaches to building assets for their projects. For this reason, a `build` script hook was added so that the build task can be altered as you need. By default Attaché will simply run `yarn prod` in your project root and assume that will get your assets built. What if you're not using `yarn`? What if your using something completely different? The `build` script works the same was as any other script hook. Pass an array of commands you need to run:
 
-```json{5}
+```json{4}
 {
-    "name": "server",
     //...
     "scripts": {
         "build": ["npm run production"]
@@ -105,9 +101,8 @@ Developers often have different approaches to building assets for their projects
 Note that if you provide a `build` script, even if it's an empty array, the default `yarn prod` script will not be executed. This is handy if you don't need the build step at all.
 :::
 
-```json{5}
+```json{4}
 {
-    "name": "server",
     //...
     "scripts": {
         "build": []

@@ -4,26 +4,23 @@
 
 ## Multiple servers
 
-You can set up as many servers are you like in the Attaché configuration file. The `servers` configuration is just a JSON array of objects, each object representing another server. The only requirement is that each server must have a unique `name` attribute.
+You can set up as many servers are you like in the Attaché configuration file. The `servers` configuration is a JSON object of server objects, each one representing another server. Each server object describes the connection details for a single deployment target. This includes the hostname, SSH port, the username, the path where the project is hosted, and the Git branch to clone.
 
-This can be handy if you want to have your testing, staging and production environments all set up in the same configuration. Or if your application is actually a number of different microservices that get deployed at the same time.
+Adding multiple servers can be handy if you want to have your testing, staging and production environments all set up in the same configuration. Or if your application is actually a number of different microservices that get deployed at the same time.
 
 ```json
 {
-    "servers": [
-        {
-            "name": "production"
+    "servers": {
+        "production": {
             //...
         },
-        {
-            "name": "staging"
+        "staging": {
             //...
         },
-        {
-            "name": "testing"
+        "testing": {
             //...
         }
-    ]
+    }
 }
 ```
 
@@ -37,7 +34,7 @@ If you only have a single server configured, you can omit the server name on the
 
 ## Common server configuration
 
-If your configuration includes multiple servers that all share some common configuration, then instead of configuration each server with exactly the same details each time, you can set a `common` server configuration object. Any attributes you set in the `common` object will be set as the default across all your server configurations. You can override the common config by adding the custom attributes to the servers that need them.
+If your configuration includes multiple servers that all share some common configuration, then instead of configuring each server with exactly the same details each time, you can set a `common` server configuration object. Any attributes you set in the `common` object will be shared across all your server configurations. You can override the common config by adding the custom attributes to the servers that need them.
 
 ```json{2-7}
 {
@@ -47,21 +44,18 @@ If your configuration includes multiple servers that all share some common confi
         "root": "/root/to/application",
         "user": "user"
     },
-    "servers": [
-        {
-            "name": "staging",
+    "servers": {
+        "staging": {
             "branch": "master"
         },
-        {
-            "name": "testing",
+        "testing": {
             "branch": "testing"
         },
-        {
-            "name": "production",
+        "production": {
             "branch": "master",
             "host": "myproductionhost.test"
         }
-    ]
+    }
 }
 ```
 
@@ -77,24 +71,39 @@ attache deploy production
 
 Each of these deploy commands will share the config from the `common` configuration, but override the name, branch and host settings per server.
 
+Technically, as long as a `common` configuration is provided, a server object is not required to contain any specific settings. The following is completely valid:
+
+```json{10}
+{
+    "common": {
+        "host": "myhost.test",
+        "port": 22,
+        "root": "/root/to/application",
+        "user": "user",
+        "branch": "master"
+    },
+    "servers": {
+        "staging": {}
+    }
+}
+```
+
 ## Default server
 
-When you have multiple servers set up, it can be useful to have one of them as the server you deploy to most often. For example, you'll likely deploy to a testing environment more often than to your production environment. Attaché provides a useful feature to set one of your servers as the default by setting the `default` attribute to the name of a server.
+When you have multiple servers set up, it can be useful to have one of them as the server you deploy to most often. For example, you might deploy to a testing environment more often than to your production environment. Attaché provides a useful feature to set one of your servers as the default by setting the `default` attribute to the name of a server.
 
 ```json{3}
 {
     "repository": "git@repository.git",
     "default": "staging",
-    "servers": [
-        {
-            "name": "staging"
+    "servers": {
+        "staging": {
             //...
         },
-        {
-            "name": "production"
+        "production": {
             //...
         }
-    ]
+    }
 }
 ```
 
@@ -111,17 +120,15 @@ If you only have a single server configuration, then that server will automatica
 ```json
 {
     "repository": "git@repository.git",
-    "default": "staging",
-    "servers": [
-        {
-            "name": "production"
+    "servers": {
+        "production": {
             //...
         }
-    ]
+    }
 }
 ```
 
-To deploy to the single server, simply run `attache deploy`:
+To deploy to this single server, simply run `attache deploy`:
 
 ```bash
 # With the example above, these two are identical:
@@ -135,11 +142,10 @@ attache deploy production
 
 Attaché is quite opinionated about how the directory structure on the server should appear. However, there is some flexibility in how the directories and files are named. You can configure this on a per-server basis by adding a `paths` object. The `attache init` command already does this when creating a new configuration file. The `paths` object is not required and a the defaults will be used.
 
-```json{6-11}
+```json{5-10}
 {
-    "servers": [
-        {
-            "name": "server",
+    "servers": {
+        "staging": {
             //...
             "paths": {
                 "releases": "releases",
@@ -148,7 +154,7 @@ Attaché is quite opinionated about how the directory structure on the server sh
                 "env": ".env"
             }
         }
-    ]
+    }
 }
 ```
 
@@ -161,17 +167,16 @@ Attaché is quite opinionated about how the directory structure on the server sh
 
 You don't need to provide all of the path overrides. Only the ones you wish to change. So it would be perfectly acceptable if you wanted to change just the `serve` symlink.
 
-```json{7}
+```json{6}
 {
-    "servers": [
-        {
-            "name": "server",
+    "servers": {
+        "staging": {
             //..
             "paths": {
                 "serve": "www"
             }
         }
-    ]
+    }
 }
 ```
 
@@ -183,14 +188,14 @@ During deployment Attaché will copy any compiled assets to the server using `sc
 
 ```json{4-7}
 {
-    "servers": [
-        {
+    "servers": {
+        "staging": {
             "assets": {
                 "public/vendors~js": "public/vendors~js",
                 "public/local-asset": "public/remote-asset"
             }
         }
-    ]
+    }
 }
 ```
 
@@ -198,13 +203,13 @@ Since assets are copied AFTER the symbolic links are created, you can also use t
 
 ```json{5}
 {
-    "servers": [
-        {
+    "servers": {
+        "staging": {
             "assets": {
                 "storage/app/public/demo": "storage/app/public/demo"
             }
         }
-    ]
+    }
 }
 ```
 
@@ -214,11 +219,10 @@ Attaché assumes that the command to run PHP on the server is simply: `php`. How
 
 Attaché provides a simple configuration solution for this scenario. You can add a `php` configuration and provide the path to the PHP binary, or just the command that needs to be run to the `bin` attribute.
 
-```json{6-10}
+```json{5-9}
 {
-    "servers": [
-        {
-            "name": "server",
+    "servers": {
+        "staging": {
             //...
             "php": {
                 "bin": "php74",
@@ -226,7 +230,7 @@ Attaché provides a simple configuration solution for this scenario. You can add
                 "bin": "/usr/local/bin/php7.4"
             }
         }
-    ]
+    }
 }
 ```
 
@@ -236,25 +240,23 @@ Like like the PHP binary configuration, you can customize the Composer configura
 
 If the name of the composer binary is something other than `composer`, you can use the same structure as the `php` object.
 
-```json{6-8}
+```json{5-7}
 {
-    "servers": [
-        {
-            "name": "server",
+    "servers": {
+        "staging": {
             //...
             "composer": {
                 "bin": "composer.phar"
             }
         }
-    ]
+    }
 }
 ```
 
 It's also very possible that you'll need to download composer manually in order to use it. Attaché will do this for you as well. Simply set the `local` attribute to true.
 
-```json{6}
+```json{5}
 {
-    "name": "server",
     //...
     "composer": {
         "bin": "composer.phar",
@@ -267,9 +269,8 @@ This will ensure that a `composer.phar` binary is downloaded and placed at the p
 
 Lastly, in some cases you may want to install dev dependencies. This is sometimes true if your demoing a project and you're seeding your database with Faker. In that case you may want to install your dev dependencies. You can do this by setting the `dev` option to `true:
 
-```json{6}
+```json{5}
 {
-    "name": "server",
     "composer": {
         "bin": "composer.phar",
         "local": true,
@@ -282,9 +283,8 @@ Lastly, in some cases you may want to install dev dependencies. This is sometime
 
 Attaché provides a simple solution to help keep your database up-to-date. If you add a `migrate` attribute to your server configuration and set it to `true`, Attaché will also run `php artisan migrate` for you inside your project. However, take note that you should be careful when doing this. Migrating a database can be destructive and since Attaché will force the migration you could potentially do damange to your database if you're not careful. For this reason, the `migrate` attribute defaults to `false` meaning you conciously need to change it to `true`.
 
-```json{4}
+```json{3}
 {
-    "name": "server",
     //...
     "migrate": true
     //...
