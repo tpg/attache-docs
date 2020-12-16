@@ -133,7 +133,8 @@ All tags are prefixed with a single `@`. If needed, you can also surround your t
 | `@release`     | The ID of the current release.                |
 | `@root`        | The remote project root path.                 |
 | `@path:<path>` | Returns the full specified path on the server |
+| `@artisan`     | Execute artisan commands.                     |
 
 ::: tip NOTE
-In previous versions you could not use the `@release` tag in a `before-build`, `after-build`, `before-deploy` or `before-clone` script hook as the ID returned was that of the currently ACTIVE release. This has changed as of 0.6.3. The `@release` tag will now always return the release ID currently being deployed.
+The `@artisan` command will execute artisan from the current deployment. This means that it will run artisan from the previous deployment in except the `after-live` hook, which will run in the new deployment. This is handy if you want to run some clean up commands before the new deployment is installed.
 :::
